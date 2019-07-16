@@ -8,6 +8,77 @@ module Publishers
 
     before_action :require_unauthenticated_publisher
 
+    skip_before_action :verify_authenticity_token, only: [:webhook]
+
+    def webhook
+      begin
+        payload_body = request.body.read
+        key = ''
+        signature = 'sha1=' + OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new('sha1'), key, payload_body)
+
+        render json: { status: 400, error:"Signatures didn't match!" } and return unless Rack::Utils.secure_compare(signature, request.env['HTTP_X_HUB_SIGNATURE'])
+
+        event = JSON.parse(request.body.read)
+        puts '------------------------------'
+
+        case event['action']
+          when 'created'
+            installed_organization(event)
+
+            # handle success invoice event
+          when 'deleted'
+            delete_organization(event)
+            # handle failure invoice event
+          # More events...
+        end
+      rescue Exception => ex
+        puts ex
+        render :json => {:status => 400, :error => "Webhook failed"} and return
+      end
+      render :json => {:status => 200}
+    end
+
+    def delete_organization(event)
+      channel_id = event['installation']['account']['id']
+      existing = Channel.joins(:github_channel_details).find_by('github_channel_details.github_channel_id': channel_id)
+
+      DeletePublisherChannelJob.perform_now(channel_id: existing.id) if existing.present?
+    end
+
+
+    # okay so the next steps
+
+    # these webhooks are async so we will need to figure out a way to handle a race condition where the user's oauth is actually linked AFTER the webhook is sent.
+    # perhaps with a job or something similar.
+    # not quite sure how to handle this yet
+    # more testing is required to see how this works when a user only choose permission on one repo
+    #
+    # fyi i was testing this out with ngrok
+    #
+    def installed_organization(event)
+      # When installing an organization we're not authorized in Publishers so we have to associate it to the sender's github
+      sender_id = event['sender']['id']
+      existing = Channel.joins(:github_channel_details).find_by('github_channel_details.github_channel_id': sender_id)
+
+      account = event['installation']['account']
+
+      existing_channel = Channel.joins(:github_channel_details).find_by(verified: true, "github_channel_details.github_channel_id": account['id'])
+      # Sometimes Github like to the same events twice, let's not do anything if the channel already exists
+      return if existing_channel.present?
+
+      @channel = existing.publisher.channels.new(verified: true)
+      @channel.details = GithubChannelDetails.new(
+        name: account['login'],
+        github_channel_id: account['id'],
+        auth_provider: __method__, # Auth provider is usually register_github_channel, but in this case it's just our method
+        thumbnail_url: account['avatar_url'],
+        channel_url: account['url'],
+        nickname: account['login'],
+      )
+
+      @channel.save! if existing_channel.blank?
+    end
+
     # Log in page
     def sign_up
       @publisher = Publisher.new(email: params[:email])
@@ -137,9 +208,9 @@ module Publishers
 
     # If an active session is present require users to explicitly sign out
     def require_unauthenticated_publisher
-      return unless current_publisher
+      # return unless current_publisher
 
-      redirect_to(publisher_next_step_path(current_publisher))
+      # redirect_to(publisher_next_step_path(current_publisher))
     end
   end
 end

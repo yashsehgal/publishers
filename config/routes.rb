@@ -1,9 +1,11 @@
 Rails.application.routes.draw do
   resources :publishers, only: %i(create update new show) do
     collection do
+
       # Registrations, eventually we should consider refactoring these routes into something a little more restful
       scope controller: 'registrations', module: 'publishers' do
         get :sign_up
+        post :webhook
         get :log_in
         get :expired_authentication_token
         post :resend_authentication_email

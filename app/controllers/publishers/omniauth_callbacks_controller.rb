@@ -208,6 +208,11 @@ module Publishers
 
     def register_github_channel
       github_auth_hash = request.env['omniauth.auth']
+
+      puts '🦄🦄🦄🦄🦄🦄🦄🦄🦄🦄🦄🦄🦄🦄🦄🦄🦄🦄🦄🦄🦄🦄🦄🦄🦄🦄🦄🦄🦄🦄'
+      pp github_auth_hash
+      puts '🦄🦄🦄🦄🦄🦄🦄🦄🦄🦄🦄🦄🦄🦄🦄🦄🦄🦄🦄🦄🦄🦄🦄🦄🦄🦄🦄🦄🦄🦄'
+
       @channel = current_publisher.channels.new(verified: true)
       @channel.details = GithubChannelDetails.new(
         name: github_auth_hash.info.name,

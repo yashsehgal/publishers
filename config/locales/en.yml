@@ -610,6 +610,7 @@ en:
       added: added %{date}
       remove_verified: Remove Channel
       one_more_step: One more step to complete...
+      reject_transfer: Reject transfer
       lets_finish: Let's Finish
       try_again: Try Again
       verification_status: Verification status will be displayed in the Brave browser within the next 24-48 hours
