@@ -271,6 +271,7 @@ class PublishersController < ApplicationController
   end
 
   def destroy
+    return unless current_publisher.last_status_update.status.in?(PublisherStatusUpdate::DELETEABLE_STATES)
     PublisherRemovalJob.perform_later(publisher_id: current_publisher.id)
     sign_out(current_publisher)
     redirect_to(root_path)
