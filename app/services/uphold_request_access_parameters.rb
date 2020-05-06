@@ -43,13 +43,11 @@ class UpholdRequestAccessParameters < BaseService
   end
 
   def perform
-    p "*** albert requesting parameters ***"
     response = connection.post do |request|
       request.url("#{Rails.application.secrets[:uphold_api_uri]}/oauth2/token")
       request.body = "code=#{@uphold_code}&grant_type=authorization_code"
     end
 
-    p "*** albert got parameters #{response.body}"
     response.body
   rescue Faraday::ClientError => e
     Rails.logger.warn("UpholdRequestAccessParameters ClientError: #{e}")
