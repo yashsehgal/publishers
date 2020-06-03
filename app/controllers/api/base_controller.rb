@@ -28,6 +28,7 @@ class Api::BaseController < ActionController::API
 
   def authenticate_ip
     return true if API_IP_WHITELIST.blank? && (Rails.env.development? || Rails.env.test?)
+    Rails.logger.info("Testing the Fastly Change the current remote_ip is #{request.remote_ip} and request.ip is #{request.ip}")
     ip_auth_result = API_IP_WHITELIST.any? { |ip_addr| ip_addr.include?(request.remote_ip) }
     ip_auth_result
   end
