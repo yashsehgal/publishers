@@ -23,6 +23,7 @@ class Api::BaseController < ActionController::API
 
   # before_action filter to protect API controller actions.
   def authenticate
+    Rails.logger.info("Running def authenticate")
     (authenticate_ip && authenticate_token) || render_unauthorized
   end
 
