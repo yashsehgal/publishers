@@ -360,7 +360,7 @@ module PublishersHelper
   end
 
   def show_faq_link?
-    !Rails.application.secrets[:hide_faqs] && FaqCategory.ready_for_display.count > 0
+    false
   end
 
   def channel_type(channel)
