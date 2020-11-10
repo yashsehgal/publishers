@@ -9,7 +9,9 @@ Follow these steps to setup the App for [creators.brave.com](https://creators.br
 1. Install **Ruby**. For a Ruby version manager try
    [rbenv](https://github.com/rbenv/rbenv). Follow the `Installation` section instructions and ensure your version is at least 1.1.2. Once installed run `rbenv install`. Be sure to restart your terminal before continuing.
 2. Install **Node 6.12.3** or greater: `brew install node`
-3. Install **Postgresql 9.5+**: `brew install postgresql`
+3. Install **Postgresql 9.5+**: https://postgresapp.com/
+
+   You might need to install using `brew install postgresql`
 
    If you get the error `psql: FATAL: role “postgres” does not exist`. You'll need to create the `/usr/local/opt/postgres/bin/createuser -s postgres`
 
