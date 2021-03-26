@@ -10,7 +10,12 @@ Rails.application.configure do
     'Access-Control-Request-Method' => "GET",
     'Access-Control-Allow-Headers' => 'Origin, X-Requested-With, Content-Type, Accept, Authorization',
     'Access-Control-Allow-Methods' => 'GET',
-    'X-Frame-Options' => 'deny'
+    'X-Content-Type-Options' => 'nosniff',
+    'X-XSS-Protection' => '1; mode=block',
+    'X-Frame-Options' => 'deny',
+    'X-Download-Options' => 'noopen',
+    'X-Permitted-Cross-Domain-Policies' => 'none',
+    'Referrer-Policy' => 'strict-origin-when-cross-origin'
   }
 
   # Settings specified here will take precedence over those in config/application.rb.
